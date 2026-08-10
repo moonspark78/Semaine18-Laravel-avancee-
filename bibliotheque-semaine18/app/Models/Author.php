@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Author extends Model
 {
-    /** @use HasFactory<\Database\Factories\AuthorFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'last_name',
+        'first_name',
+        'email',
+        'phone',
+    ];
 }
