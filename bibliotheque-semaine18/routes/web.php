@@ -3,6 +3,7 @@
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,3 +16,4 @@ Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.crea
 Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
 
 Route::resource('authors', AuthorController::class);
+Route::resource('books', BookController::class);
