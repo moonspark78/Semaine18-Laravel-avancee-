@@ -21,7 +21,10 @@ class LoanController extends Controller
     public function create()
     {
         $users = User::all();
-        $books = Book::all();
+
+        $books = Book::whereDoesntHave('loans', function ($query) {
+            $query->whereNull('returned_at');
+        })->get();
 
         return view('loans.create', compact('users', 'books'));
     }
