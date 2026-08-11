@@ -1,81 +1,59 @@
 <?php
 
-use App\Http\Controllers\AuthorController;
-use App\Http\Controllers\BookController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\ConfirmablePasswordController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::middleware('guest')->group(function () {
+    Route::get('register', [RegisteredUserController::class, 'create'])
+        ->name('register');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    Route::post('register', [RegisteredUserController::class, 'store']);
+
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
+
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+        ->name('password.request');
+
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->name('password.email');
+
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+        ->name('password.reset');
+
+    Route::post('reset-password', [NewPasswordController::class, 'store'])
+        ->name('password.store');
+});
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+    Route::get('verify-email', EmailVerificationPromptController::class)
+        ->name('verification.notice');
 
-require __DIR__.'/auth.php';
+    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
 
+    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
 
-Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
-Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
+        ->name('password.confirm');
 
-Route::get('/connexion-test', function() {
-    // dd(Auth::id());
-    // Auth::attempt(["email" => "pierra@mail.com", "password" => "password"]);
-});
+    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-Route::get('/session-test', function() {
-    session([
-        "formation" => "Laravel",
-    ]);
-    return "Session enregistrée ! :)";
-});
+    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-Route::get('/session-read', function() {
-   dd(session('formation'));
-});
-
-Route::get('/flash', function(){
-    session()->flash(
-        'success',
-        'Le rôle a été créé'
-    );
-    return redirect('/flash-view');
-});
-
-Route::get('/flash-view', function() {
-    return view('flash');
-});
-
-Route::get('/admin', function(){
-    return "Ici c'est la Zone Admin!!!";
-})->middleware('admin');
-
-Route::middleware(["admin", "auth"])->group(function(){
-Route::resource('authors', AuthorController::class);
-Route::resource('books', BookController::class);
-});
-
-Route::get('/loan-add', function(){
-    $user = User::find(1);
-    // $user->books()->attach(
-    //     3,
-    //     [
-    //         "borrowed_at" => now()
-    //     ]
-    // );
-    // $user->books()->detach(3);
-    $user->books()->sync([   
-        2,5,8
-    ]);
-    return "Emprunt ajouté !";
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout');
 });
