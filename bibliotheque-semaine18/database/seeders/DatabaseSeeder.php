@@ -11,7 +11,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        User::factory(10)->create();
+        $admin = User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+        ]);
+
+        $staff = User::factory()->create([
+            'name' => 'Staff',
+            'email' => 'staff@example.com',
+        ]);
 
         $authors = Author::factory(10)->create();
 
@@ -22,7 +30,16 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
+            RoleSeeder::class,
             LoanSeeder::class,
+        ]);
+
+        $admin->update([
+            'role_id' => 1,
+        ]);
+
+        $staff->update([
+            'role_id' => 2,
         ]);
     }
 }

@@ -9,18 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-        return redirect()->route('login');
+            return redirect()->route('login');
         }
 
-        if (Auth::user()->role->name !== "admin"){
+        if (Auth::user()->role->name !== "admin" && Auth::user()->role->name !== "staff") {
             abort(403);
         }
 
