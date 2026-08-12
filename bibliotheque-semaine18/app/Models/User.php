@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     protected function casts(): array
     {
@@ -21,16 +22,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-    public function isStaffOrAdmin(): bool
-    {
-        return $this->role && in_array($this->role->name, ['admin', 'staff'], true);
     }
 
     public function loans()
