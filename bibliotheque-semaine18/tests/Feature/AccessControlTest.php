@@ -2,12 +2,17 @@
 
 use App\Models\Author;
 use App\Models\Book;
-use App\Models\Role;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 it('restricts management routes to admin and staff', function () {
-    $userRole = Role::create(['name' => 'user']);
-    $user = User::factory()->create(['role_id' => $userRole->id]);
+    Role::create([
+        'name' => 'user',
+        'guard_name' => 'web',
+    ]);
+
+    $user = User::factory()->create();
+    $user->assignRole('user');
 
     $this->actingAs($user)
         ->get('/books/create')
@@ -18,20 +23,39 @@ it('restricts management routes to admin and staff', function () {
         ->assertForbidden();
 });
 
-it('applies the delete policy rules for books and authors', function () {
-    $adminRole = Role::create(['name' => 'admin']);
-    $staffRole = Role::create(['name' => 'staff']);
-    $userRole = Role::create(['name' => 'user']);
 
-    $admin = User::factory()->create(['role_id' => $adminRole->id]);
-    $staff = User::factory()->create(['role_id' => $staffRole->id]);
-    $user = User::factory()->create(['role_id' => $userRole->id]);
+it('applies the delete policy rules for books and authors', function () {
+    Role::create([
+        'name' => 'admin',
+        'guard_name' => 'web',
+    ]);
+
+    Role::create([
+        'name' => 'staff',
+        'guard_name' => 'web',
+    ]);
+
+    Role::create([
+        'name' => 'user',
+        'guard_name' => 'web',
+    ]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin');
+
+    $staff = User::factory()->create();
+    $staff->assignRole('staff');
+
+    $user = User::factory()->create();
+    $user->assignRole('user');
 
     $author = Author::factory()->create();
+
     $bookCreatedByStaff = Book::factory()->create([
         'author_id' => $author->id,
         'created_by' => $staff->id,
     ]);
+
     $bookCreatedByAdmin = Book::factory()->create([
         'author_id' => $author->id,
         'created_by' => $admin->id,
