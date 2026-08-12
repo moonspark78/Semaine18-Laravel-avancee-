@@ -19,21 +19,21 @@ class BookPolicy
 
     public function create(User $user): bool
     {
-        return $user->isStaffOrAdmin();
+        return $user->hasAnyRole(['admin', 'staff']);
     }
 
     public function update(User $user, Book $book): bool
     {
-        return $user->isStaffOrAdmin();
+        return $user->hasAnyRole(['admin', 'staff']);
     }
 
     public function delete(User $user, Book $book): bool
     {
-        if ($user->role?->name === 'admin') {
+        if ($user->hasRole('admin')) {
             return true;
         }
 
-        if ($user->role?->name === 'staff') {
+        if ($user->hasRole('staff')) {
             return (int) $book->created_by === (int) $user->id;
         }
 
@@ -42,11 +42,11 @@ class BookPolicy
 
     public function restore(User $user, Book $book): bool
     {
-        return $user->isStaffOrAdmin();
+        return $user->hasAnyRole(['admin', 'staff']);
     }
 
     public function forceDelete(User $user, Book $book): bool
     {
-        return $user->role?->name === 'admin';
+        return $user->hasRole('admin');
     }
 }

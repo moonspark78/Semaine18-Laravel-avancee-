@@ -29,11 +29,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Author::class, AuthorPolicy::class);
 
         Gate::define('manage-books', function (User $user): bool {
-            return $user->isStaffOrAdmin();
+            return $user->hasAnyRole(['admin', 'staff']);
         });
 
         Gate::define('manage-authors', function (User $user): bool {
-            return $user->isStaffOrAdmin();
+            return $user->hasAnyRole(['admin', 'staff']);
         });
     }
 }
