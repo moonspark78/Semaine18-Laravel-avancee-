@@ -28,6 +28,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function isStaffOrAdmin(): bool
+    {
+        return $this->role && in_array($this->role->name, ['admin', 'staff'], true);
+    }
+
     public function loans()
     {
         return $this->hasMany(Loan::class);
