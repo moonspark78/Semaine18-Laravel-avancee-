@@ -9,7 +9,7 @@ class StoreAuthorRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->isStaffOrAdmin();
+        return auth()->check() && auth()->user()->hasAnyRole(['admin', 'staff']);
     }
 
     public function rules(): array
