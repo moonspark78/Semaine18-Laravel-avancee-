@@ -10,9 +10,38 @@ class BookController extends Controller
 {
     public function index()
     {
-        $books = Book::with('author')->get();
+        $books = Book::with('author')->paginate(5);
 
         return view('books.index', compact('books'));
+    }
+
+    public function trash()
+    {
+        $this->authorize('create', Book::class);
+
+        $books = Book::onlyTrashed()
+            ->with('author')
+            ->paginate(5);
+
+        return view('books.trash', compact('books'));
+    }
+
+    public function restore(Book $book)
+    {
+        $this->authorize('create', Book::class);
+
+        $book->restore();
+
+        return redirect()->route('books.trash');
+    }
+
+    public function forceDelete(Book $book)
+    {
+        $this->authorize('delete', $book);
+
+        $book->forceDelete();
+
+        return redirect()->route('books.trash');
     }
 
     public function create()
