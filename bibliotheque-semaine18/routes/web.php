@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,21 @@ Route::middleware('auth')->group(function () {
         Route::delete('/authors/{author}', [AuthorController::class, 'destroy'])
             ->name('authors.destroy');
     });
+
+    Route::get('/loans', [LoanController::class, 'index'])
+        ->name('loans.index');
+
+    Route::get('/loans/create', [LoanController::class, 'create'])
+        ->name('loans.create');
+
+    Route::post('/loans', [LoanController::class, 'store'])
+        ->name('loans.store');
+
+    Route::put('/loans/{loan}', [LoanController::class, 'update'])
+        ->name('loans.update');
+
+    Route::post('/loans/{loan}/remind', [LoanController::class, 'remind'])
+        ->name('loans.remind');
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');

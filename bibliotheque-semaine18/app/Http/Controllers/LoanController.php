@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\LoanReminderMail;
 use App\Models\Loan;
 use App\Models\User;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class LoanController extends Controller
 {
@@ -52,5 +54,15 @@ class LoanController extends Controller
         ]);
 
         return redirect()->route('loans.index');
+    }
+
+    public function remind(Loan $loan)
+    {
+        Mail::to($loan->user->email)
+            ->send(new LoanReminderMail($loan));
+
+        return redirect()
+            ->route('loans.index')
+            ->with('success', 'La relance a bien été envoyée.');
     }
 }
