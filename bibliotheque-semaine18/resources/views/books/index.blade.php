@@ -1,18 +1,26 @@
 <h1>Livres</h1>
 
 @can('create', App\Models\Book::class)
-    <a href="{{route('books.create')}}">Ajouter un livre</a>
+    <a href="{{ route('books.create') }}">Ajouter un livre</a>
+    <br>
+    <a href="{{ route('books.trash') }}">Voir la corbeille</a>
 @endcan
 
 <table>
     @foreach($books as $book)
     <tr>
-        <td>{{$book->title}}</td>
-        <td>{{$book->author->first_name}} {{$book->author->last_name}}</td>
+        <td>{{ $book->title }}</td>
+
+        <td>
+            {{ $book->author->first_name }}
+            {{ $book->author->last_name }}
+        </td>
 
         @can('update', $book)
             <td>
-                <a href="{{route('books.edit', $book)}}">Modifier</a>
+                <a href="{{ route('books.edit', $book) }}">
+                    Modifier
+                </a>
             </td>
         @else
             <td></td>
@@ -20,10 +28,13 @@
 
         @can('delete', $book)
             <td>
-                <form action="{{route('books.destroy', $book)}}" method="POST">
+                <form action="{{ route('books.destroy', $book) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit">Supprimer</button>
+
+                    <button type="submit">
+                        Supprimer
+                    </button>
                 </form>
             </td>
         @else
@@ -32,3 +43,7 @@
     </tr>
     @endforeach
 </table>
+
+<br>
+
+{{ $books->links() }}
