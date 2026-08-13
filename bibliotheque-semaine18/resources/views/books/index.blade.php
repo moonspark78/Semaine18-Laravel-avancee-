@@ -46,4 +46,19 @@
 
 <br>
 
-{{ $books->links() }}
+<div>
+    Showing {{ $books->firstItem() }} to {{ $books->lastItem() }}
+    of {{ $books->total() }} results
+</div>
+
+<br>
+
+@if ($books->previousPageUrl())
+    <a href="{{ $books->previousPageUrl() }}">&lt;</a>
+@endif
+
+&nbsp;
+
+@if ($books->nextPageUrl())
+    <a href="{{ $books->nextPageUrl() }}">&gt;</a>
+@endif
